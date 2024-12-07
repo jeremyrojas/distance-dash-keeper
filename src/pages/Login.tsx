@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -58,6 +60,26 @@ const Login = () => {
             }}
             providers={[]}
             theme="light"
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: 'Email',
+                  password_label: 'Password',
+                  button_label: 'Sign in',
+                  loading_button_label: 'Signing in...',
+                  social_provider_text: 'Sign in with {{provider}}',
+                  link_text: "Don't have an account? Sign up",
+                }
+              }
+            }}
+            onError={(error) => {
+              console.error('Auth error:', error);
+              toast({
+                variant: "destructive",
+                title: "Authentication Error",
+                description: error.message || "Invalid login credentials. Please check your email and password.",
+              });
+            }}
           />
         </div>
       </div>
