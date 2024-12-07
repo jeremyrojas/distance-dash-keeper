@@ -30,27 +30,13 @@ const Login = () => {
         console.log('User updated');
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+      } else if (event === 'USER_DELETED') {
+        console.log('User account deleted');
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const handleError = (error: Error) => {
-    if (error.message.includes('Invalid login credentials')) {
-      toast({
-        title: "Account not found",
-        description: "User not found, please create an account",
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -75,7 +61,6 @@ const Login = () => {
             }}
             providers={[]}
             theme="light"
-            onError={handleError}
             localization={{
               variables: {
                 sign_in: {
@@ -85,6 +70,7 @@ const Login = () => {
                   loading_button_label: 'Signing in...',
                   social_provider_text: 'Sign in with {{provider}}',
                   link_text: "Don't have an account? Sign up",
+                  error_message: 'User not found, please create an account'
                 }
               }
             }}
