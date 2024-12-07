@@ -72,14 +72,6 @@ const Login = () => {
                 }
               }
             }}
-            onError={(error) => {
-              console.error('Auth error:', error);
-              toast({
-                variant: "destructive",
-                title: "Authentication Error",
-                description: error.message || "Invalid login credentials. Please check your email and password.",
-              });
-            }}
           />
         </div>
       </div>
