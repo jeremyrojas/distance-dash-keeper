@@ -58,9 +58,6 @@ const Login = () => {
             }}
             providers={[]}
             theme="light"
-            onError={(error) => {
-              console.error('Auth error:', error);
-            }}
           />
         </div>
       </div>
