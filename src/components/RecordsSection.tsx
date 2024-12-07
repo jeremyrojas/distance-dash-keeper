@@ -106,7 +106,7 @@ const RecordsSection = ({ userId }: RecordsSectionProps) => {
       <h2 className="text-xl font-semibold text-center mb-6">Personal Records</h2>
       <div className="space-y-4">
         {RECORD_TYPES.map((record) => (
-          <div key={record.distance} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+          <div key={record.distance} className="grid grid-cols-1 md:grid-cols-[1fr,2fr,2fr] gap-4 items-center">
             <label className="text-secondary font-medium">{record.distance}</label>
             <input
               type="text"

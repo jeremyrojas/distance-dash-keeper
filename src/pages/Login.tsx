@@ -10,7 +10,6 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -37,6 +36,22 @@ const Login = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const handleError = (error: Error) => {
+    if (error.message.includes('Invalid login credentials')) {
+      toast({
+        title: "Account not found",
+        description: "User not found, please create an account",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -60,6 +75,7 @@ const Login = () => {
             }}
             providers={[]}
             theme="light"
+            onError={handleError}
             localization={{
               variables: {
                 sign_in: {

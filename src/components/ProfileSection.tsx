@@ -19,6 +19,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
     bio: ''
   });
   const [saving, setSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -30,12 +31,17 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('name, location, bio')
+        .select('name, location, bio, avatar_url')
         .eq('id', userId)
         .single();
 
       if (error) throw error;
-      if (data) setProfile(data);
+      if (data) {
+        setProfile(data);
+        if (data.avatar_url) {
+          setPreviewUrl(data.avatar_url);
+        }
+      }
     } catch (error) {
       console.error("Error loading profile:", error);
     }
@@ -44,6 +50,8 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
       onImageUpload(file);
     }
   };
@@ -85,9 +93,13 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
       <div className="flex flex-col items-center space-y-4">
         <div className="relative">
           <div className="w-32 h-32 rounded-full bg-surface-dark flex items-center justify-center overflow-hidden border-2 border-primary">
-            <label htmlFor="profile-image" className="cursor-pointer w-full h-full flex items-center justify-center">
-              <span className="text-secondary text-sm">Upload Photo</span>
-            </label>
+            {previewUrl ? (
+              <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <label htmlFor="profile-image" className="cursor-pointer w-full h-full flex items-center justify-center">
+                <span className="text-secondary text-sm">Upload Photo</span>
+              </label>
+            )}
           </div>
           <input
             type="file"
