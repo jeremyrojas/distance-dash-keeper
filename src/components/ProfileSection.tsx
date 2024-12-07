@@ -1,14 +1,82 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileSectionProps {
   onImageUpload: (file: File) => void;
+  userId: string | undefined;
 }
 
-const ProfileSection = ({ onImageUpload }: ProfileSectionProps) => {
+interface Profile {
+  name: string;
+  location: string;
+  bio: string;
+}
+
+const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
+  const [profile, setProfile] = useState<Profile>({
+    name: '',
+    location: '',
+    bio: ''
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      loadProfile();
+    }
+  }, [userId]);
+
+  const loadProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('name, location, bio')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      if (data) setProfile(data);
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       onImageUpload(file);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!userId) {
+      console.error("No authenticated user found");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: profile.name,
+          location: profile.location,
+          bio: profile.bio,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+      console.log("Profile updated successfully");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -34,6 +102,9 @@ const ProfileSection = ({ onImageUpload }: ProfileSectionProps) => {
           <div>
             <input
               type="text"
+              name="name"
+              value={profile.name}
+              onChange={handleInputChange}
               placeholder="Name"
               className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors"
             />
@@ -41,17 +112,30 @@ const ProfileSection = ({ onImageUpload }: ProfileSectionProps) => {
           <div>
             <input
               type="text"
+              name="location"
+              value={profile.location}
+              onChange={handleInputChange}
               placeholder="Location"
               className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors"
             />
           </div>
           <div>
             <textarea
+              name="bio"
+              value={profile.bio}
+              onChange={handleInputChange}
               placeholder="Bio (max 150 characters)"
               maxLength={150}
               className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors resize-none h-24"
             />
           </div>
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save Profile'}
+          </button>
         </div>
       </div>
     </section>
