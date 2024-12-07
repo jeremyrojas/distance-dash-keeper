@@ -30,8 +30,6 @@ const Login = () => {
         console.log('User updated');
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out');
-      } else if (event === 'USER_DELETED') {
-        console.log('User account deleted');
       }
     });
 
@@ -69,8 +67,7 @@ const Login = () => {
                   button_label: 'Sign in',
                   loading_button_label: 'Signing in...',
                   social_provider_text: 'Sign in with {{provider}}',
-                  link_text: "Don't have an account? Sign up",
-                  error_message: 'User not found, please create an account'
+                  link_text: "Don't have an account? Sign up"
                 }
               }
             }}
