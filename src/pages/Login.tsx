@@ -8,9 +8,27 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        console.log('User already logged in, redirecting...');
         navigate('/');
+      }
+    };
+    
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      
+      if (event === 'SIGNED_IN') {
+        console.log('User signed in successfully');
+        navigate('/');
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated');
+      } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
       }
     });
 
@@ -31,9 +49,18 @@ const Login = () => {
         <div className="mt-8">
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{ 
+              theme: ThemeSupa,
+              style: {
+                button: { background: '#2563eb', color: 'white' },
+                anchor: { color: '#2563eb' },
+              },
+            }}
             providers={[]}
             theme="light"
+            onError={(error) => {
+              console.error('Auth error:', error);
+            }}
           />
         </div>
       </div>
