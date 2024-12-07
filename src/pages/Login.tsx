@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,6 +31,8 @@ const Login = () => {
         console.log('User updated');
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+      } else if (event === 'USER_DELETED') {
+        console.log('User deleted');
       }
     });
 
