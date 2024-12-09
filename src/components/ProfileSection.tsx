@@ -92,15 +92,15 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
     <section className="animate-fade-in space-y-6 p-6 bg-surface rounded-lg shadow-sm">
       <div className="flex flex-col items-center space-y-4">
         <div className="relative">
-          <div className="w-32 h-32 rounded-full bg-surface-dark flex items-center justify-center overflow-hidden border-2 border-primary">
-            {previewUrl ? (
-              <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <label htmlFor="profile-image" className="cursor-pointer w-full h-full flex items-center justify-center">
+          <label htmlFor="profile-image" className="cursor-pointer">
+            <div className="w-32 h-32 rounded-full bg-surface-dark flex items-center justify-center overflow-hidden border-2 border-primary">
+              {previewUrl ? (
+                <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
                 <span className="text-secondary text-sm">Upload Photo</span>
-              </label>
-            )}
-          </div>
+              )}
+            </div>
+          </label>
           <input
             type="file"
             id="profile-image"
