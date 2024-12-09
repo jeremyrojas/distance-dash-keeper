@@ -40,10 +40,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
       if (error) throw error;
       if (data) {
         setProfile(data);
-        // Set the preview URL to the avatar_url from the database
-        if (data.avatar_url) {
-          setPreviewUrl(data.avatar_url);
-        }
+        setPreviewUrl(data.avatar_url);
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -78,6 +75,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
           name: profile.name,
           location: profile.location,
           bio: profile.bio,
+          avatar_url: previewUrl, // Make sure we're saving the current preview URL
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
@@ -98,7 +96,15 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
           <label htmlFor="profile-image" className="cursor-pointer">
             <div className="w-32 h-32 rounded-full bg-surface-dark flex items-center justify-center overflow-hidden border-2 border-primary">
               {previewUrl ? (
-                <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
+                <img 
+                  src={previewUrl} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error("Error loading image:", e);
+                    setPreviewUrl(null);
+                  }}
+                />
               ) : (
                 <span className="text-secondary text-sm">Upload Photo</span>
               )}
