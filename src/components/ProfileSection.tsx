@@ -10,13 +10,15 @@ interface Profile {
   name: string;
   location: string;
   bio: string;
+  avatar_url: string | null;
 }
 
 const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
   const [profile, setProfile] = useState<Profile>({
     name: '',
     location: '',
-    bio: ''
+    bio: '',
+    avatar_url: null
   });
   const [saving, setSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -38,6 +40,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
       if (error) throw error;
       if (data) {
         setProfile(data);
+        // Set the preview URL to the avatar_url from the database
         if (data.avatar_url) {
           setPreviewUrl(data.avatar_url);
         }
