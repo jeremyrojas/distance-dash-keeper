@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import ProfileSection from "../components/ProfileSection";
 import RecordsSection from "../components/RecordsSection";
 import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +38,43 @@ const Index = () => {
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      if (!session?.user?.id) {
+        console.error("No authenticated user found");
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${session.user.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', session.user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      console.log("Profile image updated successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -61,46 +99,6 @@ const Index = () => {
       </div>
     </div>
   );
-};
-
-const handleImageUpload = async (file: File) => {
-  try {
-    const session = await supabase.auth.getSession();
-    const userId = session.data.session?.user?.id;
-    
-    if (!userId) {
-      console.error("No authenticated user found");
-      return;
-    }
-
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${userId}/${Math.random()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ avatar_url: publicUrl })
-      .eq('id', userId);
-
-    if (updateError) {
-      throw updateError;
-    }
-
-    console.log("Profile image updated successfully");
-  } catch (error) {
-    console.error("Error uploading image:", error);
-  }
 };
 
 export default Index;
