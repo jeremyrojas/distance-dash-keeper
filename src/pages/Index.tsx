@@ -27,40 +27,13 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleImageUpload = async (file: File) => {
+  const handleLogout = async () => {
     try {
-      if (!session?.user?.id) {
-        console.error("No authenticated user found");
-        return;
-      }
-
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${session.user.id}/${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', session.user.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      console.log("Profile image updated successfully");
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      // Navigation will be handled by the auth state change listener
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error logging out:", error);
     }
   };
 
@@ -76,7 +49,7 @@ const Index = () => {
             Running Personal Record Tracker
           </h1>
           <button
-            onClick={() => supabase.auth.signOut()}
+            onClick={handleLogout}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
           >
             Logout
@@ -88,6 +61,46 @@ const Index = () => {
       </div>
     </div>
   );
+};
+
+const handleImageUpload = async (file: File) => {
+  try {
+    const session = await supabase.auth.getSession();
+    const userId = session.data.session?.user?.id;
+    
+    if (!userId) {
+      console.error("No authenticated user found");
+      return;
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${userId}/${Math.random()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', userId);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    console.log("Profile image updated successfully");
+  } catch (error) {
+    console.error("Error uploading image:", error);
+  }
 };
 
 export default Index;
