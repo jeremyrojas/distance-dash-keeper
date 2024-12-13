@@ -81,8 +81,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container max-w-3xl py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
+      <div className="container py-8 px-4">
+        <div className="flex justify-between items-center mb-8 max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-center animate-fade-in">
             Running Personal Record Tracker
           </h1>

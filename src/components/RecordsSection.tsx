@@ -102,11 +102,11 @@ const RecordsSection = ({ userId }: RecordsSectionProps) => {
   };
 
   return (
-    <section className="animate-fade-in space-y-6 p-6 bg-surface rounded-lg shadow-sm mt-6">
+    <section className="animate-fade-in space-y-6 p-6 bg-surface rounded-lg shadow-sm mt-6 max-w-4xl mx-auto w-full">
       <h2 className="text-xl font-semibold text-center mb-6">Personal Records</h2>
       <div className="space-y-4">
         {RECORD_TYPES.map((record) => (
-          <div key={record.distance} className="grid grid-cols-1 md:grid-cols-[1fr,2fr,2fr] gap-4 items-center">
+          <div key={record.distance} className="grid grid-cols-1 md:grid-cols-[1fr,2fr,3fr] gap-4 items-center">
             <label className="text-secondary font-medium">{record.distance}</label>
             <input
               type="text"
@@ -115,7 +115,7 @@ const RecordsSection = ({ userId }: RecordsSectionProps) => {
               onChange={(e) => handleInputChange(record.distance, 'time', e.target.value)}
               className="px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors"
             />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Location"
@@ -127,7 +127,7 @@ const RecordsSection = ({ userId }: RecordsSectionProps) => {
                 type="date"
                 value={records[record.distance]?.date_achieved || ''}
                 onChange={(e) => handleInputChange(record.distance, 'date_achieved', e.target.value)}
-                className="px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors"
+                className="px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:border-primary transition-colors w-full"
               />
             </div>
           </div>

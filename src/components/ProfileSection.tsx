@@ -90,7 +90,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
   };
 
   return (
-    <section className="animate-fade-in space-y-6 p-6 bg-surface rounded-lg shadow-sm">
+    <section className="animate-fade-in space-y-6 p-6 bg-surface rounded-lg shadow-sm max-w-4xl mx-auto w-full">
       <div className="flex flex-col items-center space-y-4">
         <div className="relative">
           <label htmlFor="profile-image" className="cursor-pointer">
@@ -119,7 +119,7 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
           />
         </div>
         
-        <div className="w-full max-w-md space-y-4">
+        <div className="w-full max-w-2xl space-y-4">
           <div>
             <input
               type="text"
