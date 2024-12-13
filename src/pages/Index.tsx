@@ -46,8 +46,10 @@ const Index = () => {
       }
 
       const fileExt = file.name.split('.').pop();
-      const filePath = `${session.user.id}/${Math.random()}.${fileExt}`;
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${session.user.id}/${fileName}`;
 
+      // Upload the file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
@@ -56,20 +58,27 @@ const Index = () => {
         throw uploadError;
       }
 
+      // Get the public URL for the uploaded file
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
+      console.log("Generated public URL:", publicUrl); // Debug log
+
+      // Update the profile with the new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', session.user.id);
 
       if (updateError) {
         throw updateError;
       }
 
-      console.log("Profile image updated successfully");
+      console.log("Profile image updated successfully with URL:", publicUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
