@@ -40,7 +40,11 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
       if (error) throw error;
       if (data) {
         setProfile(data);
-        setPreviewUrl(data.avatar_url);
+        // Set the preview URL from the profile data
+        if (data.avatar_url) {
+          setPreviewUrl(data.avatar_url);
+          console.log("Loaded avatar URL:", data.avatar_url); // Debug log
+        }
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -75,7 +79,6 @@ const ProfileSection = ({ onImageUpload, userId }: ProfileSectionProps) => {
           name: profile.name,
           location: profile.location,
           bio: profile.bio,
-          avatar_url: previewUrl, // Make sure we're saving the current preview URL
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
