@@ -11,7 +11,6 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session and subscribe to auth changes
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -28,16 +27,6 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      // Navigation will be handled by the auth state change listener
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
-
   const handleImageUpload = async (file: File) => {
     try {
       if (!session?.user?.id) {
@@ -50,20 +39,22 @@ const Index = () => {
       const filePath = `${session.user.id}/${fileName}`;
 
       // Upload the file to Supabase storage
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          upsert: true
+        });
 
       if (uploadError) {
         throw uploadError;
       }
 
-      // Get the public URL for the uploaded file
+      // Get the public URL directly from the storage bucket
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      console.log("Generated public URL:", publicUrl); // Debug log
+      console.log("Generated public URL:", publicUrl);
 
       // Update the profile with the new avatar URL
       const { error: updateError } = await supabase
@@ -78,7 +69,7 @@ const Index = () => {
         throw updateError;
       }
 
-      console.log("Profile image updated successfully with URL:", publicUrl);
+      console.log("Profile updated successfully with URL:", publicUrl);
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -96,7 +87,7 @@ const Index = () => {
             Running Personal Record Tracker
           </h1>
           <button
-            onClick={handleLogout}
+            onClick={() => supabase.auth.signOut()}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
           >
             Logout
